@@ -70,6 +70,7 @@ def run(_run, _config, _log):
 
     # Run and train
     run_sequential(args=args, logger=logger)
+    logger.close()
 
     # Clean up after finishing
     print("Exiting Main")
@@ -82,10 +83,6 @@ def run(_run, _config, _log):
             print("Thread joined")
 
     print("Exiting script")
-
-    # Making sure framework really exits
-    os._exit(os.EX_OK)
-
 
 def evaluate_sequential(args, runner):
     for _ in range(args.test_nepisode):

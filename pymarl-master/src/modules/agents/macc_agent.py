@@ -1,5 +1,4 @@
 import torch as th
-from torch._C import device
 import torch.nn as nn
 import torch.nn.functional as F
 

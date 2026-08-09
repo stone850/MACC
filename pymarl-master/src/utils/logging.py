@@ -43,6 +43,11 @@ class Logger:
     def log_histogram(self, key, value, t):
         self.writer.add_histogram(key, value, t)
 
+    def close(self):
+        if self.use_tb:
+            self.writer.flush()
+            self.writer.close()
+
     def print_recent_stats(self):
         log_str = "Recent Stats | t_env: {:>10} | Episode: {:>8}\n".format(*self.stats["episode"][-1])
         i = 0
@@ -69,4 +74,3 @@ def get_logger():
     logger.setLevel('DEBUG')
 
     return logger
-

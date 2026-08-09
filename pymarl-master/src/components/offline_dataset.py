@@ -329,7 +329,16 @@ class OfflineDatasetWriter:
 
 
 class OfflineEpisodeDataset:
-    def __init__(self, dataset_path, split="train", seed=0, device="cpu", verify_checksums=False, cache_size=2):
+    def __init__(
+        self,
+        dataset_path,
+        split="train",
+        seed=0,
+        device="cpu",
+        verify_checksums=False,
+        cache_size=2,
+        max_episodes=None,
+    ):
         self.path = Path(dataset_path).expanduser().resolve()
         metadata_path = self.path / "metadata.yaml"
         if not metadata_path.is_file():
@@ -346,6 +355,15 @@ class OfflineEpisodeDataset:
 
         self.split = split
         self.episode_ids = [int(value) for value in splits[split]]
+        if max_episodes is not None:
+            max_episodes = int(max_episodes)
+            if max_episodes <= 0 or max_episodes > len(self.episode_ids):
+                raise ValueError(
+                    "max_episodes must be in [1, {}] for split '{}', got {}".format(
+                        len(self.episode_ids), split, max_episodes
+                    )
+                )
+            self.episode_ids = self.episode_ids[:max_episodes]
         self.rng = np.random.RandomState(seed)
         self.device = device
         self.schema_manifest = self.metadata["schema"]

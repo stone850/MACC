@@ -15,8 +15,9 @@ class OfflineDatasetTest(unittest.TestCase):
         batch.data.transition_data["filled"][0, :length + 1] = 1
         batch.data.transition_data["state"][0, :length + 1] = marker
         batch.data.transition_data["obs"][0, :length + 1] = marker
-        batch.data.transition_data["avail_actions"][0, :length + 1] = 1
-        batch.data.transition_data["actions"][0, :length + 1] = marker % 6
+        action = marker % 6
+        batch.data.transition_data["avail_actions"][0, :length + 1, :, action] = 1
+        batch.data.transition_data["actions"][0, :length + 1] = action
         batch.data.transition_data["reward"][0, :length] = marker
         batch.data.transition_data["terminated"][0, length - 1] = 1
         batch.data.transition_data["subtask_state"][0, :length + 1] = marker
@@ -62,6 +63,12 @@ class OfflineDatasetTest(unittest.TestCase):
             self.assertIn("actions_onehot", dataset.scheme)
             self.assertIn("filled", dataset.scheme)
             self.assertIsInstance(dataset.scheme["obs"]["vshape"], int)
+            full_train = OfflineEpisodeDataset(dataset_path, split="train")
+            subset = OfflineEpisodeDataset(dataset_path, split="train", max_episodes=2)
+            self.assertEqual(len(subset), 2)
+            self.assertEqual(subset.episode_ids, full_train.episode_ids[:2])
+            with self.assertRaises(ValueError):
+                OfflineEpisodeDataset(dataset_path, split="train", max_episodes=0)
             for episode_id, expected in enumerate(episodes):
                 loaded = dataset.get_episode(episode_id)
                 for field in TRANSITION_FIELDS:

@@ -182,6 +182,15 @@ def _check_episode(dataset, episode_id):
 
 def check_dataset(dataset_path, require_collection_event=False):
     dataset = OfflineEpisodeDataset(dataset_path, split="all", seed=0, verify_checksums=True)
+    if dataset.metadata.get("dataset_version") == "lbf_episode_v2":
+        _require(dataset.metadata.get("git_dirty") is False, "v2 dataset was not collected from a clean repository")
+        runtime_versions = dataset.metadata.get("runtime_versions", {})
+        for package in ("python", "torch", "numpy", "gym", "lbforaging", "sacred"):
+            _require(runtime_versions.get(package), "v2 metadata is missing runtime version '{}'".format(package))
+        if dataset.metadata.get("quality_label") == "medium":
+            selection = dataset.metadata.get("checkpoint_selection", {})
+            _require(selection.get("evaluation_t") is not None, "Medium dataset lacks checkpoint evaluation step")
+            _require(selection.get("evaluation_return") is not None, "Medium dataset lacks checkpoint evaluation return")
     _check_splits(dataset_path, int(dataset.metadata["n_episodes"]))
     summaries = [_check_episode(dataset, episode_id) for episode_id in dataset.episode_ids]
     collection_events = sum(item["collection_events"] for item in summaries)

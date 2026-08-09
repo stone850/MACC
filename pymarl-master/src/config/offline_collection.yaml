@@ -3,6 +3,10 @@ collection_epsilon: 0.1
 collection_episodes: 20
 dataset_path: "datasets/lbf/debug_v1"
 dataset_version: "lbf_episode_v1"
+dataset_quality_label: "debug"
+dataset_checkpoint_eval_t: null
+dataset_checkpoint_eval_return: null
+dataset_require_clean_git: False
 dataset_shard_size: 100
 dataset_split_seed: 0
 dataset_split_ratios:

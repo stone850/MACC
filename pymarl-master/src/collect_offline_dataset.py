@@ -1,7 +1,9 @@
 from collections.abc import Mapping
 from copy import deepcopy
 import hashlib
+from importlib import metadata as importlib_metadata
 from pathlib import Path
+import platform
 import pprint
 import subprocess
 import sys
@@ -99,6 +101,23 @@ def _git_version(repo_root):
         return {"git_commit": None, "git_dirty": None}
 
 
+def _runtime_versions():
+    def package_version(name):
+        try:
+            return importlib_metadata.version(name)
+        except importlib_metadata.PackageNotFoundError:
+            return None
+
+    return {
+        "python": platform.python_version(),
+        "torch": th.__version__,
+        "numpy": np.__version__,
+        "gym": package_version("gym"),
+        "lbforaging": package_version("lbforaging"),
+        "sacred": package_version("sacred"),
+    }
+
+
 def collect_dataset(config, sacred_log):
     config = _config_copy(config)
     if config["env"] != "foraging":
@@ -150,8 +169,12 @@ def collect_dataset(config, sacred_log):
         runner.t_env = checkpoint_step
 
         repo_root = Path(__file__).resolve().parents[2]
+        git_version = _git_version(repo_root)
+        if args.dataset_require_clean_git and git_version["git_dirty"] is not False:
+            raise RuntimeError("dataset_require_clean_git=True but the repository is not clean")
         metadata = {
             "dataset_version": args.dataset_version,
+            "quality_label": args.dataset_quality_label,
             "algorithm": args.name,
             "checkpoint_path": str(model_path),
             "checkpoint_step": checkpoint_step,
@@ -163,8 +186,14 @@ def collect_dataset(config, sacred_log):
             "env_info": _config_copy(env_info),
             "resolved_config": config,
             "policy_eval_mode": True,
+            "runtime_versions": _runtime_versions(),
         }
-        metadata.update(_git_version(repo_root))
+        if args.dataset_checkpoint_eval_t is not None or args.dataset_checkpoint_eval_return is not None:
+            metadata["checkpoint_selection"] = {
+                "evaluation_t": args.dataset_checkpoint_eval_t,
+                "evaluation_return": args.dataset_checkpoint_eval_return,
+            }
+        metadata.update(git_version)
         split_seed = int(args.dataset_split_seed)
         writer = OfflineDatasetWriter(
             args.dataset_path,

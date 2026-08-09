@@ -450,12 +450,22 @@ class OfflineEpisodeDataset:
                 raise TypeError("Field '{}' in {} has dtype {}".format(field, filename, tensor.dtype))
 
     def _batch_from_ids(self, episode_ids):
-        rows = []
-        for episode_id in episode_ids:
+        indexed_rows = []
+        for position, episode_id in enumerate(episode_ids):
             if episode_id not in self._episode_index:
                 raise KeyError("Unknown episode ID {}".format(episode_id))
             shard_index, row = self._episode_index[episode_id]
-            rows.append((self._load_shard(shard_index), row))
+            indexed_rows.append((shard_index, position, row))
+
+        rows = [None] * len(indexed_rows)
+        indexed_rows.sort(key=lambda item: item[0])
+        current_shard_index = None
+        current_payload = None
+        for shard_index, position, row in indexed_rows:
+            if shard_index != current_shard_index:
+                current_payload = self._load_shard(shard_index)
+                current_shard_index = shard_index
+            rows[position] = (current_payload, row)
 
         batch = EpisodeBatch(
             self._base_scheme,

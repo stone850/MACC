@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import torch as th
 
@@ -69,6 +70,12 @@ class OfflineDatasetTest(unittest.TestCase):
             self.assertEqual(subset.episode_ids, full_train.episode_ids[:2])
             with self.assertRaises(ValueError):
                 OfflineEpisodeDataset(dataset_path, split="train", max_episodes=0)
+
+            uncached = OfflineEpisodeDataset(dataset_path, split="all", cache_size=1)
+            with patch("components.offline_dataset.th.load", wraps=th.load) as mocked_load:
+                interleaved = uncached._batch_from_ids([0, 2, 1, 3])
+            self.assertEqual(mocked_load.call_count, 2)
+            self.assertEqual(interleaved["state"][:, 0, 0].tolist(), [1.0, 3.0, 2.0, 4.0])
             for episode_id, expected in enumerate(episodes):
                 loaded = dataset.get_episode(episode_id)
                 for field in TRANSITION_FIELDS:

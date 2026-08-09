@@ -48,6 +48,16 @@ class EpisodeRunner:
         self.env.reset()
         self.t = 0
 
+    def _get_pre_transition_data(self):
+        data = {
+            "state": [self.env.get_state()],
+            "avail_actions": [self.env.get_avail_actions()],
+            "obs": [self.env.get_obs()],
+        }
+        if hasattr(self.env, "get_subtask_data"):
+            data.update({key: [value] for key, value in self.env.get_subtask_data().items()})
+        return data
+
     def run(self, test_mode=False):
         self.reset()
 
@@ -59,11 +69,7 @@ class EpisodeRunner:
             self.mac.init_latent(batch_size=self.batch_size)
 
         while not terminated:
-            pre_transition_data = {
-                "state": [self.env.get_state()],
-                "avail_actions": [self.env.get_avail_actions()],
-                "obs": [self.env.get_obs()]
-            }
+            pre_transition_data = self._get_pre_transition_data()
 
             self.batch.update(pre_transition_data, ts=self.t)
 
@@ -87,11 +93,7 @@ class EpisodeRunner:
 
             self.t += 1
 
-        last_data = {
-            "state": [self.env.get_state()],
-            "avail_actions": [self.env.get_avail_actions()],
-            "obs": [self.env.get_obs()]
-        }
+        last_data = self._get_pre_transition_data()
         self.batch.update(last_data, ts=self.t)
 
         # Select actions in the last stored state

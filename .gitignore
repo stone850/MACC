@@ -160,3 +160,4 @@ cython_debug/
 
 # Local reproduction artifacts
 artifacts/
+pymarl-master/datasets/

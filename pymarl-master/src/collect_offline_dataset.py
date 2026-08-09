@@ -104,14 +104,14 @@ def _git_version(repo_root):
 def _runtime_versions():
     def package_version(name):
         try:
-            return importlib_metadata.version(name)
+            return str(importlib_metadata.version(name))
         except importlib_metadata.PackageNotFoundError:
             return None
 
     return {
-        "python": platform.python_version(),
-        "torch": th.__version__,
-        "numpy": np.__version__,
+        "python": str(platform.python_version()),
+        "torch": str(th.__version__),
+        "numpy": str(np.__version__),
         "gym": package_version("gym"),
         "lbforaging": package_version("lbforaging"),
         "sacred": package_version("sacred"),

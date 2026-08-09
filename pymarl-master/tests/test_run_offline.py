@@ -43,6 +43,7 @@ class FakeRunner:
     def run(self, test_mode=False):
         self.calls.append(test_mode)
         self.t = 3
+        return {"reward": th.tensor([[[float(len(self.calls))]]])}
 
     def close_env(self):
         self.closed = True
@@ -154,6 +155,7 @@ class OfflineRunnerTest(unittest.TestCase):
                 "test": 0,
             })
             self.assertEqual(summary["train_episodes"], 2)
+            self.assertEqual(summary["learning_rate"], 1e-6)
             self.assertNotEqual(summary["parameter_hash_before"], summary["parameter_hash_after"])
             self.assertTrue(summary["dataset_shard_checksums_unchanged"])
 
@@ -183,6 +185,9 @@ class OfflineRunnerTest(unittest.TestCase):
         result = evaluator.evaluate(10)
         self.assertEqual(created[0].calls, [True, True])
         self.assertEqual(result["environment_steps"], 6)
+        self.assertEqual(result["return_mean"], 1.5)
+        self.assertEqual(result["return_std"], 0.5)
+        self.assertEqual(result["episode_length_mean"], 3.0)
         evaluator.close()
         self.assertTrue(created[0].closed)
 

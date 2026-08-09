@@ -13,6 +13,7 @@ offline_overfit_mode: False
 offline_overfit_window: 100
 offline_overfit_final_ratio: 0.2
 seed: 1
+lr: 0.000001
 
 batch_size: 32
 batch_size_run: 1

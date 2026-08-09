@@ -123,24 +123,25 @@ class OfflineEvaluator:
         was_training = self.mac.agent.training
         self.mac.agent.eval()
         steps_before = self.environment_steps
+        episode_returns = []
+        episode_lengths = []
         try:
             for _ in range(self.runner.args.offline_eval_episodes):
-                self.runner.run(test_mode=True)
+                episode_batch = self.runner.run(test_mode=True)
                 self.calls += 1
                 self.environment_steps += int(self.runner.t)
+                episode_returns.append(float(episode_batch["reward"].sum().item()))
+                episode_lengths.append(int(self.runner.t))
         finally:
             self.mac.agent.train(was_training)
-        def latest_stat(key):
-            values = getattr(self.logger, "stats", {}).get(key, [])
-            return None if not values else float(values[-1][1])
 
         return {
             "gradient_step": int(gradient_step),
             "episodes": int(self.runner.args.offline_eval_episodes),
             "environment_steps": self.environment_steps - steps_before,
-            "return_mean": latest_stat("test_return_mean"),
-            "return_std": latest_stat("test_return_std"),
-            "episode_length_mean": latest_stat("test_ep_length_mean"),
+            "return_mean": float(np.mean(episode_returns)),
+            "return_std": float(np.std(episode_returns)),
+            "episode_length_mean": float(np.mean(episode_lengths)),
         }
 
     def close(self):
@@ -280,6 +281,9 @@ def run_offline_training(config, sacred_log, sacred_run=None, evaluator_registry
             "validation_episode_ids": [int(value) for value in dataset_splits["validation"]],
             "test_episode_ids": [int(value) for value in dataset_splits["test"]],
             "batch_size": int(args.batch_size),
+            "learning_rate": float(args.lr),
+            "target_update_interval": int(args.target_update_interval),
+            "seed": int(args.seed),
             "start_gradient_step": start_step,
             "gradient_updates": int(args.offline_updates),
             "final_gradient_step": final_step,

@@ -1,14 +1,18 @@
 # Offline QMIX defaults. Training batches come only from OfflineEpisodeDataset.
+use_offline_training: True
 dataset_path: ""
 offline_updates: 50000
 offline_train_split: "train"
 offline_max_train_episodes: 0
 offline_verify_checksums: True
+offline_eval_at_start: True
 offline_eval_interval: 1000
 offline_eval_episodes: 40
 offline_eval_seed: 10001
 offline_save_interval: 5000
 offline_output_path: "results/offline"
+offline_divergence_window: 10
+offline_divergence_ratio_threshold: 1000.0
 offline_overfit_mode: False
 offline_overfit_window: 100
 offline_overfit_final_ratio: 0.2

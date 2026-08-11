@@ -3,6 +3,7 @@ from components.episode_buffer import EpisodeBatch
 from modules.mixers.vdn import VDNMixer
 from modules.mixers.qmix import QMixer
 from modules.mixers.qmix_hidden import QMixerHidden
+from .offline_diagnostics import compute_offline_q_diagnostics
 import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
@@ -245,12 +246,27 @@ class LatentQLearner:
         masked_td_error = td_error * mask
 
         # Normal L2 loss, take mean over actual data
-        loss = (masked_td_error ** 2).sum() / mask.sum()
+        td_loss = (masked_td_error ** 2).sum() / mask.sum()
 
         if hasattr(self.args, 'gdx_weight'):
-            loss = loss * self.args.gdx_weight / th.sqrt(reg_loss + 1e-8) + reg_loss
+            loss = td_loss * self.args.gdx_weight / th.sqrt(reg_loss + 1e-8) + reg_loss
         else:
-            loss += reg_loss
+            loss = td_loss + reg_loss
+
+        offline_training = getattr(self.args, "use_offline_training", False)
+        offline_diagnostics = None
+        if offline_training:
+            offline_diagnostics = compute_offline_q_diagnostics(
+                mac_out=mac_out,
+                actions=actions,
+                avail_actions=avail_actions,
+                mixer_states=self.new_states,
+                mixer=self.mixer,
+                data_q_tot=chosen_action_qvals,
+                targets=targets,
+                td_error=td_error,
+                mask=mask,
+            )
 
         # Optimise
         self.optimiser.zero_grad()
@@ -258,28 +274,51 @@ class LatentQLearner:
         grad_norm = th.nn.utils.clip_grad_norm_(self.params, self.args.grad_norm_clip)
         self.optimiser.step()
 
+        target_updated = False
         if (episode_num - self.last_target_update_episode) / self.args.target_update_interval >= 1.0:
             self._update_targets()
             self.last_target_update_episode = episode_num
+            target_updated = True
 
-        if t_env - self.log_stats_t >= self.args.learner_log_interval:
-            self.logger.log_stat("loss", loss.item(), t_env)
+        mask_elems = mask.sum().item()
+        metrics = {
+            "loss": loss.item(),
+            "td_loss": td_loss.item(),
+            "representation_loss": reg_loss.item(),
+            "recon_loss": recon_loss.item(),
+            "sim_loss": sim_loss.item(),
+            "grad_norm": float(grad_norm),
+            "td_error_abs": masked_td_error.abs().sum().item() / mask_elems,
+            "q_taken_mean": (
+                (chosen_action_qvals * mask).sum().item()
+                / (mask_elems * self.args.n_agents)
+            ),
+            "target_mean": (
+                (targets * mask).sum().item()
+                / (mask_elems * self.args.n_agents)
+            ),
+            "target_updated": target_updated,
+        }
+        if offline_training:
+            metrics.update(offline_diagnostics)
+
+        if not offline_training and t_env - self.log_stats_t >= self.args.learner_log_interval:
+            self.logger.log_stat("loss", metrics["loss"], t_env)
             if reg_flag:
-                self.logger.log_stat("reg_loss", reg_loss.item(), t_env)
+                self.logger.log_stat("reg_loss", metrics["representation_loss"], t_env)
             if recon_flag:
-                self.logger.log_stat("recon_loss", recon_loss.item(), t_env)
+                self.logger.log_stat("recon_loss", metrics["recon_loss"], t_env)
             if mi_flag:
-                self.logger.log_stat("sim_loss", sim_loss.item(), t_env)
+                self.logger.log_stat("sim_loss", metrics["sim_loss"], t_env)
             if entropy_flag:
                 self.logger.log_stat("entropy_loss", entropy_loss.item(), t_env)
-            self.logger.log_stat("grad_norm", grad_norm, t_env)
-            mask_elems = mask.sum().item()
-            self.logger.log_stat("td_error_abs", (masked_td_error.abs().sum().item()/mask_elems), t_env)
-            self.logger.log_stat("q_taken_mean", (chosen_action_qvals * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
-            self.logger.log_stat("target_mean", (targets * mask).sum().item()/(mask_elems * self.args.n_agents), t_env)
-            
-            
+            self.logger.log_stat("grad_norm", metrics["grad_norm"], t_env)
+            self.logger.log_stat("td_error_abs", metrics["td_error_abs"], t_env)
+            self.logger.log_stat("q_taken_mean", metrics["q_taken_mean"], t_env)
+            self.logger.log_stat("target_mean", metrics["target_mean"], t_env)
             self.log_stats_t = t_env
+
+        return metrics
 
     def _log_from_mac_out(self, logs, t):
         if len(logs) == 0: 
@@ -314,4 +353,5 @@ class LatentQLearner:
         self.target_mac.load_models(path)
         if self.mixer is not None:
             self.mixer.load_state_dict(th.load("{}/mixer.th".format(path), map_location=lambda storage, loc: storage))
+            self.target_mixer.load_state_dict(self.mixer.state_dict())
         self.optimiser.load_state_dict(th.load("{}/opt.th".format(path), map_location=lambda storage, loc: storage))

@@ -63,6 +63,43 @@ bash scripts/repro/smoke.sh sc2 1 5m_vs_6m
 Sacred 和 TensorBoard 结果会写入 `pymarl-master/results/` 目录。Foraging 和 PP
 记录 `test_return_mean`，SC2 记录 `test_battle_won_mean`。
 
+## 冻结数据上的阶段三基线
+
+`src/run_offline.py` 只支持阶段三的两条直接离线化基线。两者都从随机初始化
+开始，从 `OfflineEpisodeDataset` 采样完整 episode；训练循环不会创建环境，环境只在
+`offline_eval_interval` 指定的评估点以 `test_mode=True` 使用。
+
+运行 Offline QMIX：
+
+```bash
+cd pymarl-master
+python src/run_offline.py --config=qmix with \
+  dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3 \
+  offline_updates=50000 use_cuda=True seed=1
+```
+
+运行保留原始高斯子任务表示、注意力和 `qmix_hidden` mixer 的 Offline MACC-QMIX：
+
+```bash
+cd pymarl-master
+python src/run_offline.py --config=macc with \
+  dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3 \
+  offline_updates=50000 batch_size=32 lr=0.000001 \
+  target_update_interval=200 \
+  offline_eval_interval=1000 offline_eval_episodes=40 \
+  offline_save_interval=5000 log_interval=100 \
+  use_cuda=True seed=1 \
+  remarks=offline_macc_medium_2k_v3_50k
+```
+
+每次运行在 `results/offline/<unique-token>/` 下写入耐中断的
+`training_metrics.jsonl`、最终 `summary.json`、TensorBoard 指标和周期 checkpoint。
+公共诊断包括 `td_loss`、`q_data_mean`、`q_max_mean`、`q_tot_abs_max`、
+`grad_norm`、`ood_action_rate` 和评估回报；MACC 还记录
+`representation_loss`、`recon_loss` 与 `sim_loss`。`ood_action_rate` 表示有效
+agent-timestep 上当前贪心动作与冻结数据动作不一致的比例，是策略分歧代理，不是行为
+策略的条件支撑概率。
+
 ## 兼容范围
 
 公开代码与论文在部分 LBF 细节上存在差异。该分支以公开代码为准：视野范围

@@ -1,0 +1,109 @@
+record_version: 1
+record_name: stage3_offline_baselines_v1
+tag: stage3-offline-baselines-v1
+recorded_at: '2026-08-11'
+
+code:
+  frozen_commit: 71b7a72def51ee587aebf7a7976d90a2714a8420
+  frozen_commit_message: 'feat: add stage-three offline QMIX baselines'
+  experiment_sacred_commit: 414356cf25c6e46d4668b702fe9f366cbe75d62e
+  experiment_sacred_dirty: true
+  provenance_note: >-
+    Sacred recorded the pre-freeze commit while the stage-three implementation was
+    uncommitted. The frozen_commit contains the reviewed stage-three working tree used
+    by these experiments.
+
+dataset:
+  path: pymarl-master/datasets/lbf/macc_medium_2m_seed1_2k_v3
+  version: lbf_episode_v2
+  quality: medium
+  n_episodes: 2000
+  split_sizes:
+    train: 1600
+    validation: 200
+    test: 200
+  metadata_sha256: 499b8d9f540d887b2b4bcd7ae76b2329f04c457642bc241e3fa16919284affa0
+  behavior_algorithm: macc
+  behavior_checkpoint_step: 2000082
+  behavior_agent_sha256: be48535d60fc985504ad36c650b60e00e72b9bf633d406aa06018c1365a56b29
+  frozen_shard_checksums_unchanged:
+    b3: true
+    b4: true
+
+experiments:
+  b3_offline_qmix:
+    status: completed
+    gradient_updates: 50000
+    training_environment_steps: 0
+    divergence_first_detected_step: 40700
+    source_summary_path: pymarl-master/results/offline/2026-08-10_20-34-57-642329__qmix__diagnostics_gpu_medium_2k_v3_50k/summary.json
+    source_summary_sha256: fc793ad63ca8f6767574248c1587d35cf98f6318b040933a3e58f094dfbddf97
+    curated_summary: b3_offline_qmix_summary.json
+    command: >-
+      python src/run_offline.py --config=qmix with
+      dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3
+      offline_updates=50000 offline_max_train_episodes=0 batch_size=32
+      lr=0.000001 target_update_interval=200 offline_eval_interval=1000
+      offline_eval_episodes=40 offline_save_interval=5000 save_model=True
+      use_cuda=True use_tensorboard=True remarks=diagnostics_gpu_medium_2k_v3_50k
+      seed=1
+    final_checkpoint:
+      path: pymarl-master/results/offline/2026-08-10_20-34-57-642329__qmix__diagnostics_gpu_medium_2k_v3_50k/models/50000
+      files_sha256:
+        agent.th: bc29d78ac22feab8ebba0063bd14fd9a8e6d89d1e4671f6693e1d83e2c19fe30
+        mixer.th: 4496c661bb5d454dbab5d2c94864520da476dc85dc43ffeec7d7ba6f1f7a69bf
+        opt.th: 3cce12601dac29d0e4d7be47e3468cef89c291f5bb11d3b169ecbcc74b4754b0
+  b4_offline_macc:
+    status: completed
+    gradient_updates: 50000
+    training_environment_steps: 0
+    divergence_first_detected_step: 29600
+    source_summary_path: pymarl-master/results/offline/2026-08-11_01-14-35-895612__macc__offline_macc_medium_2k_v3_50k/summary.json
+    source_summary_sha256: f69f82c470f82439ae486739d5095d8c9ca0cc52239c0f3761ef27584bf550d5
+    curated_summary: b4_offline_macc_summary.json
+    command: >-
+      python src/run_offline.py --config=macc with
+      dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3
+      offline_updates=50000 batch_size=32 lr=0.000001
+      target_update_interval=200 offline_eval_interval=1000
+      offline_eval_episodes=40 offline_save_interval=5000 log_interval=100
+      use_cuda=True seed=1 remarks=offline_macc_medium_2k_v3_50k
+    final_checkpoint:
+      path: pymarl-master/results/offline/2026-08-11_01-14-35-895612__macc__offline_macc_medium_2k_v3_50k/models/50000
+      files_sha256:
+        agent.th: 40c7c8503168da64caffafd6abb382d38f348b90bf6e9dc8a3e0cfe4a582fb3c
+        mixer.th: e5f267331f89528df212bc42a4c1a69be73eb7ca59a5b3bebccc5f125d574a6a
+        opt.th: c40d7f4957cacf00e788188633662d639b16d9bf0180d3225610dad5a3594801
+
+environment:
+  host_os: Linux-5.15.0-139-generic-x86_64-with-glibc2.31
+  cpu: Intel(R) Core(TM) i7-14700K
+  gpu: NVIDIA GeForce RTX 4090
+  gpu_memory_mib: 24564
+  nvidia_driver: 535.230.02
+  python: 3.9.25
+  torch: 2.0.1
+  numpy: 1.23.5
+  pyyaml: 6.0.1
+  sacred: 0.8.5
+  gym: 0.17.2
+  lbforaging: 1.0.15
+
+verification:
+  tests:
+    working_directory: pymarl-master
+    command: >-
+      env -u LD_LIBRARY_PATH PYTHONPATH=src
+      /home/stone/anaconda3/envs/macc/bin/python -m unittest discover -s tests -v
+    result: passed
+    tests_run: 15
+  pre_commit_checks:
+    git_diff_check: passed
+    required_metrics_finite: true
+    evaluation_count_each: 51
+    periodic_checkpoint_count_each: 10
+  curated_summary_generation: jq
+
+artifact_policy:
+  tracked: curated summaries and this manifest
+  ignored: datasets, raw summaries, checkpoints, JSONL metrics, and TensorBoard files

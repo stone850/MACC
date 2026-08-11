@@ -1,0 +1,191 @@
+{
+  "record_version": 1,
+  "baseline_id": "B3",
+  "algorithm": {
+    "name": "Offline QMIX",
+    "training_algorithm": "qmix",
+    "behavior_algorithm": "macc",
+    "mac": "basic_mac",
+    "learner": "q_learner",
+    "mixer": "qmix"
+  },
+  "status": "completed",
+  "source_summary": {
+    "path": "pymarl-master/results/offline/2026-08-10_20-34-57-642329__qmix__diagnostics_gpu_medium_2k_v3_50k/summary.json",
+    "sha256": "fc793ad63ca8f6767574248c1587d35cf98f6318b040933a3e58f094dfbddf97"
+  },
+  "dataset": {
+    "path": "pymarl-master/datasets/lbf/macc_medium_2m_seed1_2k_v3",
+    "version": "lbf_episode_v2",
+    "metadata_sha256": "499b8d9f540d887b2b4bcd7ae76b2329f04c457642bc241e3fa16919284affa0",
+    "split_sizes": {
+      "test": 200,
+      "train": 1600,
+      "validation": 200
+    },
+    "training_split": "train",
+    "training_episodes": 1600,
+    "shard_checksums_unchanged": true
+  },
+  "training": {
+    "command": "python src/run_offline.py --config=qmix with dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3 offline_updates=50000 offline_max_train_episodes=0 batch_size=32 lr=0.000001 target_update_interval=200 offline_eval_interval=1000 offline_eval_episodes=40 offline_save_interval=5000 save_model=True use_cuda=True use_tensorboard=True remarks=diagnostics_gpu_medium_2k_v3_50k seed=1",
+    "seed": 1,
+    "gradient_updates": 50000,
+    "start_gradient_step": 0,
+    "final_gradient_step": 50000,
+    "batch_size": 32,
+    "learning_rate": 1e-06,
+    "target_update_interval": 200,
+    "training_environment_steps": 0,
+    "target_update_records": 250
+  },
+  "evaluation": {
+    "count": 51,
+    "environment_episode_calls": 2040,
+    "environment_steps": 102000,
+    "initial": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 0,
+      "return_mean": -0.10000000149011612,
+      "return_std": 0
+    },
+    "best": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 50000,
+      "return_mean": -0.10000000149011612,
+      "return_std": 0
+    },
+    "final": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 50000,
+      "return_mean": -0.10000000149011612,
+      "return_std": 0
+    }
+  },
+  "divergence": {
+    "detected": true,
+    "first_detected_step": 40700,
+    "q_tot_abs_max_growth_ratio": 1012.3884238630628,
+    "ratio_threshold": 1000,
+    "status": "detected",
+    "td_loss_growth_ratio": 98900.56093987328,
+    "window": 10
+  },
+  "loss": {
+    "window": 100,
+    "initial_mean": 110.91112525939941,
+    "final_mean": 56254019.76,
+    "minimum": 61.444095611572266,
+    "maximum": 75370584,
+    "final_to_initial_abs_ratio": 507199.0715848645
+  },
+  "metrics": {
+    "grad_norm": {
+      "final_mean": 312745904,
+      "final_to_initial_abs_ratio": 135983.52109646643,
+      "initial_mean": 2299.880908203125,
+      "maximum": 540052672,
+      "minimum": 1928.994384765625,
+      "window": 10
+    },
+    "greedy_action_disagreement_rate": {
+      "final_mean": 0.7902539372444153,
+      "final_to_initial_abs_ratio": 0.9021934635022668,
+      "initial_mean": 0.8759251415729523,
+      "maximum": 0.8874328136444092,
+      "minimum": 0.7433844208717346,
+      "window": 10
+    },
+    "ood_action_rate": {
+      "final_mean": 0.7902539372444153,
+      "final_to_initial_abs_ratio": 0.9021934635022668,
+      "initial_mean": 0.8759251415729523,
+      "maximum": 0.8874328136444092,
+      "minimum": 0.7433844208717346,
+      "window": 10
+    },
+    "q_data_mean": {
+      "final_mean": 69210.11796875,
+      "final_to_initial_abs_ratio": 3723.533753081685,
+      "initial_mean": 18.587213802337647,
+      "maximum": 76550.515625,
+      "minimum": 14.686165809631348,
+      "window": 10
+    },
+    "q_gap_mean": {
+      "final_mean": 4735.140576171875,
+      "final_to_initial_abs_ratio": 496.2048671193294,
+      "initial_mean": 9.542712879180907,
+      "maximum": 5255.43603515625,
+      "minimum": 8.582423210144043,
+      "window": 10
+    },
+    "q_max_mean": {
+      "final_mean": 73945.26015625,
+      "final_to_initial_abs_ratio": 2628.704350879728,
+      "initial_mean": 28.129926490783692,
+      "maximum": 81559.4453125,
+      "minimum": 23.908292770385742,
+      "window": 10
+    },
+    "q_tot_abs_max": {
+      "final_mean": 166706.825,
+      "final_to_initial_abs_ratio": 2493.764272147731,
+      "initial_mean": 66.84947204589844,
+      "maximum": 197294.671875,
+      "minimum": 51.88945388793945,
+      "window": 10
+    },
+    "target_abs_max": {
+      "final_mean": 162859.6984375,
+      "final_to_initial_abs_ratio": 2534.5660161152605,
+      "initial_mean": 64.25545730590821,
+      "maximum": 191915.40625,
+      "minimum": 51.368560791015625,
+      "window": 10
+    },
+    "target_mean": {
+      "final_mean": 70445.95078125,
+      "final_to_initial_abs_ratio": 2686.451703047824,
+      "initial_mean": 26.222675323486328,
+      "maximum": 77540.625,
+      "minimum": 23.102018356323242,
+      "window": 10
+    },
+    "td_error_abs_mean": {
+      "final_mean": 4595.94619140625,
+      "final_to_initial_abs_ratio": 579.0551425550539,
+      "initial_mean": 7.936975002288818,
+      "maximum": 5196.05029296875,
+      "minimum": 6.819646835327148,
+      "window": 10
+    },
+    "td_loss": {
+      "final_mean": 51146486.8,
+      "final_to_initial_abs_ratio": 501438.7480566522,
+      "initial_mean": 101.99947052001953,
+      "maximum": 63484604,
+      "minimum": 78.52102661132812,
+      "window": 10
+    }
+  },
+  "ood_action_rate_definition": "Fraction of valid agent-timesteps where the current available-action greedy action differs from the frozen dataset action; this is a policy-disagreement proxy, not a conditional behavior-support probability.",
+  "parameter_hashes": {
+    "before": "7ca7705caeeef9f41339e0fd23a83dc7adc8ff843d94ac8d16586a96500e4775",
+    "after": "1a67576736719d8da85c27ba97d3c5d796001b98c1b0949d86adad40a8ff76e8"
+  },
+  "final_checkpoint": {
+    "path": "pymarl-master/results/offline/2026-08-10_20-34-57-642329__qmix__diagnostics_gpu_medium_2k_v3_50k/models/50000",
+    "files_sha256": {
+      "agent.th": "bc29d78ac22feab8ebba0063bd14fd9a8e6d89d1e4671f6693e1d83e2c19fe30",
+      "mixer.th": "4496c661bb5d454dbab5d2c94864520da476dc85dc43ffeec7d7ba6f1f7a69bf",
+      "opt.th": "3cce12601dac29d0e4d7be47e3468cef89c291f5bb11d3b169ecbcc74b4754b0"
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "record_version": 1,
+  "baseline_id": "B4",
+  "algorithm": {
+    "name": "Offline MACC-QMIX",
+    "training_algorithm": "macc",
+    "behavior_algorithm": "macc",
+    "mac": "macc_mac",
+    "learner": "latent_q_learner",
+    "mixer": "qmix_hidden"
+  },
+  "status": "completed",
+  "source_summary": {
+    "path": "pymarl-master/results/offline/2026-08-11_01-14-35-895612__macc__offline_macc_medium_2k_v3_50k/summary.json",
+    "sha256": "f69f82c470f82439ae486739d5095d8c9ca0cc52239c0f3761ef27584bf550d5"
+  },
+  "dataset": {
+    "path": "pymarl-master/datasets/lbf/macc_medium_2m_seed1_2k_v3",
+    "version": "lbf_episode_v2",
+    "metadata_sha256": "499b8d9f540d887b2b4bcd7ae76b2329f04c457642bc241e3fa16919284affa0",
+    "split_sizes": {
+      "test": 200,
+      "train": 1600,
+      "validation": 200
+    },
+    "training_split": "train",
+    "training_episodes": 1600,
+    "shard_checksums_unchanged": true
+  },
+  "training": {
+    "command": "python src/run_offline.py --config=macc with dataset_path=datasets/lbf/macc_medium_2m_seed1_2k_v3 offline_updates=50000 batch_size=32 lr=0.000001 target_update_interval=200 offline_eval_interval=1000 offline_eval_episodes=40 offline_save_interval=5000 log_interval=100 use_cuda=True seed=1 remarks=offline_macc_medium_2k_v3_50k",
+    "seed": 1,
+    "gradient_updates": 50000,
+    "start_gradient_step": 0,
+    "final_gradient_step": 50000,
+    "batch_size": 32,
+    "learning_rate": 1e-06,
+    "target_update_interval": 200,
+    "training_environment_steps": 0,
+    "target_update_records": 250
+  },
+  "evaluation": {
+    "count": 51,
+    "environment_episode_calls": 2040,
+    "environment_steps": 102000,
+    "initial": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 0,
+      "return_mean": -0.09687500139698386,
+      "return_std": 0.019515619326605754
+    },
+    "best": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 3000,
+      "return_mean": -0.0885416679084301,
+      "return_std": 0.04165364459937992
+    },
+    "final": {
+      "environment_steps": 2000,
+      "episode_length_mean": 50,
+      "episodes": 40,
+      "gradient_step": 50000,
+      "return_mean": -0.10000000149011612,
+      "return_std": 0
+    }
+  },
+  "divergence": {
+    "detected": true,
+    "first_detected_step": 29600,
+    "q_tot_abs_max_growth_ratio": 1010.7979008024387,
+    "ratio_threshold": 1000,
+    "status": "detected",
+    "td_loss_growth_ratio": 155453.7631665929,
+    "window": 10
+  },
+  "loss": {
+    "window": 100,
+    "initial_mean": 0.10615127950906754,
+    "final_mean": 7680647.265,
+    "minimum": 0.054234616458415985,
+    "maximum": 9603147,
+    "final_to_initial_abs_ratio": 72355672.9652412
+  },
+  "metrics": {
+    "grad_norm": {
+      "final_mean": 18630468.5,
+      "final_to_initial_abs_ratio": 5487797.455835679,
+      "initial_mean": 3.3948899626731874,
+      "maximum": 29714318,
+      "minimum": 1.720988392829895,
+      "window": 10
+    },
+    "greedy_action_disagreement_rate": {
+      "final_mean": 0.7971879184246063,
+      "final_to_initial_abs_ratio": 1.053593920741556,
+      "initial_mean": 0.7566367864608765,
+      "maximum": 0.8515514731407166,
+      "minimum": 0.7243632674217224,
+      "window": 10
+    },
+    "loss": {
+      "final_mean": 6738864.55,
+      "final_to_initial_abs_ratio": 54899581.75386169,
+      "initial_mean": 0.12274892330169677,
+      "maximum": 8037720.5,
+      "minimum": 0.06781323254108429,
+      "window": 10
+    },
+    "ood_action_rate": {
+      "final_mean": 0.7971879184246063,
+      "final_to_initial_abs_ratio": 1.053593920741556,
+      "initial_mean": 0.7566367864608765,
+      "maximum": 0.8515514731407166,
+      "minimum": 0.7243632674217224,
+      "window": 10
+    },
+    "q_data_mean": {
+      "final_mean": 18560.7701171875,
+      "final_to_initial_abs_ratio": 22206.408748552636,
+      "initial_mean": 0.8358294367790222,
+      "maximum": 20544.408203125,
+      "minimum": 0.34336286783218384,
+      "window": 10
+    },
+    "q_gap_mean": {
+      "final_mean": 1417.5697875976562,
+      "final_to_initial_abs_ratio": 3425.5757649844145,
+      "initial_mean": 0.4138194233179092,
+      "maximum": 1588.2607421875,
+      "minimum": 0.36293455958366394,
+      "window": 10
+    },
+    "q_max_mean": {
+      "final_mean": 19978.339453125,
+      "final_to_initial_abs_ratio": 15987.162356430315,
+      "initial_mean": 1.2496488749980927,
+      "maximum": 22132.671875,
+      "minimum": 0.7062973380088806,
+      "window": 10
+    },
+    "q_tot_abs_max": {
+      "final_mean": 50286.212890625,
+      "final_to_initial_abs_ratio": 20051.52201254035,
+      "initial_mean": 2.507850170135498,
+      "maximum": 59048.46484375,
+      "minimum": 1.3695787191390991,
+      "window": 10
+    },
+    "recon_loss": {
+      "final_mean": 0.005813154624775052,
+      "final_to_initial_abs_ratio": 6.081489242240035,
+      "initial_mean": 0.0009558768244460226,
+      "maximum": 0.005933741573244333,
+      "minimum": 0.0009471389930695295,
+      "window": 10
+    },
+    "representation_loss": {
+      "final_mean": 0.005813154624775052,
+      "final_to_initial_abs_ratio": 6.081489242240035,
+      "initial_mean": 0.0009558768244460226,
+      "maximum": 0.005933741573244333,
+      "minimum": 0.0009471389930695295,
+      "window": 10
+    },
+    "sim_loss": {
+      "final_mean": 0,
+      "final_to_initial_abs_ratio": 0,
+      "initial_mean": 0,
+      "maximum": 0,
+      "minimum": 0,
+      "window": 10
+    },
+    "target_abs_max": {
+      "final_mean": 47338.4546875,
+      "final_to_initial_abs_ratio": 21058.94234795217,
+      "initial_mean": 2.2479027628898622,
+      "maximum": 56686.8046875,
+      "minimum": 1.5898685455322266,
+      "window": 10
+    },
+    "target_mean": {
+      "final_mean": 18854.8439453125,
+      "final_to_initial_abs_ratio": 17668.843887540123,
+      "initial_mean": 1.067123806476593,
+      "maximum": 20954.408203125,
+      "minimum": 0.702399730682373,
+      "window": 10
+    },
+    "td_error_abs_mean": {
+      "final_mean": 1485.5835815429687,
+      "final_to_initial_abs_ratio": 5463.233898829111,
+      "initial_mean": 0.27192384749650955,
+      "maximum": 1656.46630859375,
+      "minimum": 0.1980140060186386,
+      "window": 10
+    },
+    "td_loss": {
+      "final_mean": 6738864.55,
+      "final_to_initial_abs_ratio": 55330454.23937083,
+      "initial_mean": 0.12179304584860802,
+      "maximum": 8037720.5,
+      "minimum": 0.06685741990804672,
+      "window": 10
+    }
+  },
+  "action_collapse_diagnostics": {
+    "action_labels": [
+      "none",
+      "north",
+      "south",
+      "west",
+      "east",
+      "load"
+    ],
+    "dataset_action_counts": [
+      3052,
+      7006,
+      6526,
+      7772,
+      6875,
+      5593
+    ],
+    "dataset_action_fractions": [
+      0.08288072995872257,
+      0.19025635455137954,
+      0.1772213773625896,
+      0.21105800564849012,
+      0.18669889202693896,
+      0.15188464045187922
+    ],
+    "greedy_action_counts": [
+      437,
+      526,
+      15781,
+      1563,
+      18517,
+      0
+    ],
+    "greedy_action_fractions": [
+      0.011867260482294155,
+      0.01428416250271562,
+      0.42855203128394526,
+      0.042445144470997176,
+      0.5028514012600478,
+      0
+    ],
+    "greedy_action_disagreement_rate": 0.7993971323050185,
+    "scope": {
+      "episodes": 200,
+      "first_episode_id": 0,
+      "last_episode_id": 244,
+      "policy_mode": "eval_greedy_available_actions",
+      "selection": "first_200_episode_ids_sorted",
+      "split": "train",
+      "valid_agent_steps": 36824
+    }
+  },
+  "ood_action_rate_definition": "Fraction of valid agent-timesteps where the current available-action greedy action differs from the frozen dataset action; this is a policy-disagreement proxy, not a conditional behavior-support probability.",
+  "parameter_hashes": {
+    "before": "c06ada83dab5fc5b4a0b38664f8c4aeb33bd463dac15b9019e83225a8606c317",
+    "after": "aa118389eb2ee8ec6523b9075239bb620d2fa7fdb5b715868a5669088e9e91ab"
+  },
+  "final_checkpoint": {
+    "path": "pymarl-master/results/offline/2026-08-11_01-14-35-895612__macc__offline_macc_medium_2k_v3_50k/models/50000",
+    "files_sha256": {
+      "agent.th": "40c7c8503168da64caffafd6abb382d38f348b90bf6e9dc8a3e0cfe4a582fb3c",
+      "mixer.th": "e5f267331f89528df212bc42a4c1a69be73eb7ca59a5b3bebccc5f125d574a6a",
+      "opt.th": "c40d7f4957cacf00e788188633662d639b16d9bf0180d3225610dad5a3594801"
+    }
+  }
+}
